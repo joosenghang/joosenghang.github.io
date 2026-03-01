@@ -132,8 +132,8 @@
         render();
       })
       .catch((err) => {
-  grid.innerHTML = `<div class="badge">Failed to load products: ${err}</div>`;
-  console.error(err);
+  grid.innerHTML = `<div class="badge">Failed to load products: ${err?.message || err}</div>`;
+  console.error("Fetch error:", err);
 });
   </script>
 </body>
