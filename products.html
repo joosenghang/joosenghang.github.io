@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Products • Joosenghang</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">
+        <div style="width:34px;height:34px;border-radius:12px;background:rgba(124,92,255,.25);display:grid;place-items:center;border:1px solid #2a2d44;">J</div>
+        <div>Joosenghang</div>
+        <span class="badge">Products</span>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a class="btn" href="./index.html">Home</a>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <input id="q" class="input" placeholder="Search products..." />
+        <select id="cat">
+          <option value="">All categories</option>
+        </select>
+      </div>
+
+      <div class="small">
+        Showing <span id="count">0</span> items
+      </div>
+    </div>
+
+    <div id="grid" class="grid"></div>
+
+    <footer>
+      Tip: For now products come from <span class="badge">products.json</span>. Next step we’ll auto-sync this from Excel.
+    </footer>
+  </div>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const q = document.getElementById("q");
+    const cat = document.getElementById("cat");
+    const count = document.getElementById("count");
+
+    function stockClass(stock){
+      if (stock <= 0) return "out";
+      if (stock <= 5) return "low";
+      return "in";
+    }
+    function stockText(stock){
+      if (stock <= 0) return "Out of stock";
+      if (stock <= 5) return "Low stock";
+      return "In stock";
+    }
+    function money(n){
+      return Number(n).toFixed(2);
+    }
+
+    let all = [];
+
+    function render(){
+      const query = q.value.trim().toLowerCase();
+      const c = cat.value;
+
+      const filtered = all.filter(p => {
+        const matchesText =
+          !query ||
+          (p.name || "").toLowerCase().includes(query) ||
+          (p.description || "").toLowerCase().includes(query) ||
+          (p.category || "").toLowerCase().includes(query);
+
+        const matchesCat = !c || (p.category || "") === c;
+        return matchesText && matchesCat;
+      });
+
+      count.textContent = filtered.length;
+
+      grid.innerHTML = filtered.map(p => {
+        const img = p.image && p.image.trim() ? `<img src="${p.image}" alt="${p.name}">` : "";
+        const cls = stockClass(Number(p.stock));
+        const st = stockText(Number(p.stock));
+
+        // For now, "Buy" can go to WhatsApp or a payment link later.
+        const buyLink = p.buyLink && p.buyLink.trim() ? p.buyLink : "#";
+
+        return `
+          <div class="card">
+            <div class="thumb">${img || `<div style="color:#cbd5e1;font-weight:700;">${(p.category||"Item").toUpperCase()}</div>`}</div>
+            <div class="card-body">
+              <div class="title-row">
+                <div class="name">${p.name}</div>
+                <div class="price">$${money(p.price)}</div>
+              </div>
+
+              <div class="meta">
+                <span class="pill">${p.category || "General"}</span>
+                <span class="pill stock ${cls}">${st} • ${p.stock}</span>
+              </div>
+
+              <div class="desc">${p.description || ""}</div>
+            </div>
+
+            <div class="card-footer">
+              <div class="small">SKU: ${p.sku || p.id || "-"}</div>
+              <a class="btn primary" href="${buyLink}" ${buyLink==="#" ? 'onclick="return false;"' : 'target="_blank" rel="noopener"'}>
+                Buy
+              </a>
+            </div>
+          </div>
+        `;
+      }).join("") || `<div class="badge">No products found.</div>`;
+    }
+
+    function populateCategories(){
+      const set = new Set(all.map(p => p.category).filter(Boolean));
+      const opts = ['<option value="">All categories</option>']
+        .concat([...set].sort().map(c => `<option value="${c}">${c}</option>`));
+      cat.innerHTML = opts.join("");
+    }
+
+    q.addEventListener("input", render);
+    cat.addEventListener("change", render);
+
+    fetch("./products.json?ts=" + Date.now())
+      .then(r => r.json())
+      .then(products => {
+        all = products;
+        populateCategories();
+        render();
+      })
+      .catch(() => {
+        grid.innerHTML = `<div class="badge">Failed to load products.json</div>`;
+      });
+  </script>
+</body>
+</html>
