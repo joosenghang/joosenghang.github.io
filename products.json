@@ -1,0 +1,35 @@
+[
+  {
+    "id": "p001",
+    "sku": "JSH-001",
+    "name": "Portable Monitor Stand",
+    "category": "Accessories",
+    "price": 19.90,
+    "stock": 12,
+    "description": "Lightweight stand for portable monitors. Simple setup, stable hold.",
+    "image": "",
+    "buyLink": ""
+  },
+  {
+    "id": "p002",
+    "sku": "JSH-002",
+    "name": "Fishing Tackle Organizer",
+    "category": "Fishing",
+    "price": 12.50,
+    "stock": 4,
+    "description": "Compact organizer for tackle and small gear. Easy to carry.",
+    "image": "",
+    "buyLink": ""
+  },
+  {
+    "id": "p003",
+    "sku": "JSH-003",
+    "name": "Sample Product (Out of Stock)",
+    "category": "General",
+    "price": 9.90,
+    "stock": 0,
+    "description": "This shows how out-of-stock items look.",
+    "image": "",
+    "buyLink": ""
+  }
+]
