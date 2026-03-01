@@ -131,9 +131,10 @@
         populateCategories();
         render();
       })
-      .catch(() => {
-        grid.innerHTML = `<div class="badge">Failed to load products.json</div>`;
-      });
+      .catch((err) => {
+  grid.innerHTML = `<div class="badge">Failed to load products: ${err}</div>`;
+  console.error(err);
+});
   </script>
 </body>
 </html>
