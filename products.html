@@ -124,17 +124,28 @@
     q.addEventListener("input", render);
     cat.addEventListener("change", render);
 
-    fetch("https://opensheet.elk.sh/17y43bzWNePzlxyz71ZjBQ80SvVmszCZ6Te_uU5lJ2L8/Products?ts=" + Date.now())
-      .then(r => r.json())
-      .then(products => {
-        all = products;
-        populateCategories();
-        render();
-      })
-      .catch((err) => {
-  grid.innerHTML = `<div class="badge">Failed to load products: ${err?.message || err}</div>`;
-  console.error("Fetch error:", err);
-});
+fetch("https://opensheet.elk.sh/17y43bzWNePzlxyz71ZjBQ80SvVmszCZ6Te_uU5lJ2L8/Products?ts=" + Date.now())
+  .then(r => r.json())
+  .then((data) => {
+    // If opensheet returns an error object, stop here
+    if (data && data.error) {
+      throw new Error(`OpenSheet error: ${data.error}`);
+    }
+
+    // Normalize: sometimes you may get a single object instead of an array
+    const products = Array.isArray(data) ? data : [data];
+
+    // Extra safety: remove totally empty rows
+    const cleaned = products.filter(p => p && (p.id || p.name));
+
+    all = cleaned;
+    populateCategories();
+    render();
+  })
+  .catch((err) => {
+    grid.innerHTML = `<div class="badge">Failed to load products: ${err?.message || err}</div>`;
+    console.error("Fetch error:", err);
+  });
   </script>
 </body>
 </html>
