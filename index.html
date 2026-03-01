@@ -1,11 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Joosenghang</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
-<body style="font-family: Arial; padding: 40px;">
-  <h1>Joosenghang</h1>
-  <p>Website is live 🚀</p>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">
+        <div style="width:34px;height:34px;border-radius:12px;background:rgba(124,92,255,.25);display:grid;place-items:center;border:1px solid #2a2d44;">J</div>
+        <div>Joosenghang</div>
+        <span class="badge">GitHub Pages</span>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a class="btn" href="./products.html">Products</a>
+      </div>
+    </div>
+
+    <section class="hero">
+      <h1>Simple, clean product listings.</h1>
+      <p>
+        This is your storefront. Next we’ll connect inventory to Excel, then add payments (Apple Pay, PayNow QR, Visa/Master) and promotions.
+      </p>
+      <div class="actions">
+        <a class="btn primary" href="./products.html">View Products</a>
+        <a class="btn" href="./products.html#new">Add New Product (next step)</a>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="yr"></span> Joosenghang • Built on GitHub Pages
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("yr").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
