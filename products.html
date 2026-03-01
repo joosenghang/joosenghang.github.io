@@ -124,7 +124,7 @@
     q.addEventListener("input", render);
     cat.addEventListener("change", render);
 
-    fetch("./products.json?ts=" + Date.now())
+    fetch("https://opensheet.elk.sh/17y43bzWNePzlxyz71ZjBQ80SvVmszCZ6Te_uU5lJ2L8/Sheet1?ts=" + Date.now())
       .then(r => r.json())
       .then(products => {
         all = products;
