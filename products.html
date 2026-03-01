@@ -128,54 +128,51 @@
 
     q.addEventListener("input", render);
     cat.addEventListener("change", render);
+// =========================
+// Google Sheets (GVIZ) fetch
+// =========================
+const SHEET_ID = "17y43bzWNePzlxyz71ZjBQ80SvVmszCZ6Te_uU5lJ2L8";
+const TAB_NAME = "Products"; // must match your sheet tab exactly
 
-    // =========================
-    // Google Sheets (GVIZ) fetch
-    // =========================
-    const SHEET_ID = "17y43bzWNePzlxyz71ZjBQ80SvVmszCZ6Te_uU5lJ2L8";
-    const TAB_NAME = "Products"; // must match your sheet tab exactly
+const gvizUrl =
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(TAB_NAME)}&ts=${Date.now()}`;
 
-    const gvizUrl =
-      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(TAB_NAME)}&ts=${Date.now()}`;
+fetch(gvizUrl)
+  .then(r => r.text())
+  .then(text => {
+    const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+    const json = JSON.parse(jsonStr);
 
-    fetch(gvizUrl)
-      .then(r => r.text())
-      .then(text => {
-        // Google returns: google.visualization.Query.setResponse({...});
-        const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
-        const json = JSON.parse(jsonStr);
+    if (!json || !json.table) {
+      throw new Error("Invalid response from Google Sheets (no table).");
+    }
 
-        if (!json || !json.table) {
-          throw new Error("Invalid response from Google Sheets (no table).");
-        }
+    const table = json.table;
+    const headers = table.cols.map(c => (c.label || "").trim());
 
-        const table = json.table;
-        const headers = table.cols.map(c => (c.label || "").trim());
-
-        const rows = table.rows.map(r => {
-          const obj = {};
-          r.c.forEach((cell, i) => {
-            obj[headers[i]] = cell ? cell.v : "";
-          });
-          return obj;
-        });
-
-        // Clean + normalize types
-        all = rows
-          .filter(p => p && (p.id || p.name))
-          .map(p => ({
-            ...p,
-            price: Number(p.price || 0),
-            stock: Number(p.stock || 0),
-          }));
-
-        populateCategories();
-        render();
-      })
-      .catch((err) => {
-        grid.innerHTML = `<div class="badge">Failed to load products: ${err?.message || err}</div>`;
-        console.error("Fetch error:", err);
+    const rows = table.rows.map(r => {
+      const obj = {};
+      r.c.forEach((cell, i) => {
+        obj[headers[i]] = cell ? cell.v : "";
       });
+      return obj;
+    });
+
+    all = rows
+      .filter(p => p && (p.id || p.name))
+      .map(p => ({
+        ...p,
+        price: Number(p.price || 0),
+        stock: Number(p.stock || 0),
+      }));
+
+    populateCategories();
+    render();
+  })
+  .catch((err) => {
+    grid.innerHTML = `<div class="badge">Failed to load products: ${err?.message || err}</div>`;
+    console.error("Fetch error:", err);
+  });
   </script>
 </body>
 </html>
